@@ -1,0 +1,62 @@
+---- DESAFIO Aula 6 ------
+
+--1. O orçamento impacta positivamente a nota dos alunos?
+---relacionar escola (coluna orçamento) com matrícula (coluna notas).
+
+SELECT * FROM academico.escola
+-- id, nome_escola, orcamento_anual, id_tipo_escola
+
+SELECT * FROM academico.matricula
+--- id, id_escola, id_estudante, id_disciplina, nota
+
+SELECT
+e.nome_escola,
+e.orcamento_anual,
+AVG(m.nota)::numeric(5,2) as media_nota
+FROM academico.escola e
+INNER JOIN academico.matricula m ON e.id = m.id_escola
+GROUP BY e.nome_escola, e.orcamento_anual
+ORDER BY media_nota DESC
+LIMIT 10
+
+
+--2. Qual tipo de escola tem melhor rendimento educacional, pública ou privada?
+--- relacionar tipo_escola com matrícula. 
+
+
+SELECT * FROM academico.tipo_escola
+--- id, descricao
+
+SELECT * FROM academico.escola
+-- id, nome_escola, orcamento_anual, id_tipo_escola
+
+SELECT * FROM academico.matricula
+--- id, id_escola, id_estudante, id_disciplina, nota
+
+SELECT 
+e.nome_escola,
+te.descricao as tipo_escola,
+AVG(m.nota)::numeric(5,2) as media_nota
+FROM academico.escola e
+JOIN academico.tipo_escola te ON e.id_tipo_escola = te.id
+JOIN academico.matricula m ON m.id_escola = e.id
+GROUP BY e.nome_escola, te.descricao
+ORDER BY media_nota DESC;
+
+
+-- 3. EM qual disciplina nossos alunos tem melhor desempenho?
+-- relacionar disciplina e nota
+
+SELECT * FROM academico. disciplina
+-- id, descricao (nome da disciplina)---
+
+SELECT * FROM academico.matricula
+--- id, id_escola, id_estudante, id_disciplina, nota
+
+SELECT 
+d.descricao as nome_disciplina,
+AVG(m.nota)::numeric(5,2) AS media_nota
+FROM academico.disciplina d
+JOIN  academico.matricula m ON m.id_disciplina = d.id
+GROUP BY d.descricao
+ORDER BY media_nota DESC;
