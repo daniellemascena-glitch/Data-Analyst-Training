@@ -1,0 +1,73 @@
+---DESAFIO AULA 6 ---
+--- Solicito a equipe de dados que seja realizada uma análise na nossa base de dados do academico, se o orçamento
+--- está impactando positivamente nas notas dos alunos de nossa rede escolar e qual tipo de escola tem um melhor 
+--- rendimento educacional. Nossos alunos tem melhor desempenho em qual disciplina?---
+
+-- Q.1. O orçamento impacta positivamente na nota dos alunos?
+-- relacionar tabela escola (coluna orçamento) com a tabela matricula (coluna nota)--
+
+SELECT * FROM academico.escola
+-- id, nome_escola, orcamento_anual, id_tipo_escola ---
+
+SELECT * FROM academico.matricula
+-- id, id_escola, id_estudante, id_disciplina, nota ---
+
+SELECT
+e.nome_escola,
+e.orcamento_anual,
+AVG (m.nota)::numeric (5,2) as media_nota
+FROM academico.escola e
+INNER JOIN academico.matricula m ON e.id = m.id_escola
+GROUP BY e.nome_escola, e.orcamento_anual
+ORDER BY media_nota DESC
+
+-- obs: P.S: observando os dados das escolas em ordem decrescente de média de notas, nota-se que escolas 
+-- com maiores orçamentos anuais não apresentam, necessariamente, as melhores notas.
+-- os dados sugerem que não há uma relação direta entre maior orçamento e melhor desempenho escolar. 
+
+
+-- Q.2. Qual tipo de escola tem melhor rendimento educacional? (pública ou privada?)--
+-- relacionar a tabela tipo_escola com tabela matrícula (coluna nota)--
+
+SELECT * FROM academico.tipo_escola
+-- id, descricao (tipo de escola)--
+
+SELECT * FROM academico.matricula
+-- id, id_escola, id_estudante, id_disciplina, nota --
+
+-- obs: como essas duas tabelas não tem relação direta, incluirei a tabela academico.escola ---
+
+SELECT * FROM academico.escola
+-- id, nome_escola, orcamento_anual, id_tipo_escola--
+
+SELECT
+te.descricao as tipo_escola,
+AVG(m.nota)::numeric (5,2) as media_nota
+FROM academico.escola e
+INNER JOIN academico.matricula m ON e.id = m.id_escola
+INNER JOIN academico.tipo_escola te ON te.id = e.id_tipo_escola
+GROUP BY te.descricao
+ORDER BY media_nota DESC
+
+--obs: o retorno mostra uma diferença muito pequena entre as médias das notas das escolas públicas das particulares 
+--(Pública: 80.89 e particular: 80.05)-- ou seja, o rendimento entre as escolas é muito semelhante.
+
+
+-- Q3. Qual disciplina nossos alunos tem melhor desempenho?
+-- relacionar a tabela disciplina e tabela matricula (coluna nota)--
+
+SELECT * FROM academico.disciplina
+-- id, descricao (nome da disciplina)---
+
+SELECT * FROM academico.matricula
+-- id, id_escola, id_estudante, id_disciplina, nota --
+
+SELECT 
+d.descricao as nome_disciplina,
+AVG (m.nota)::numeric (5,2) as media_nota
+FROM academico.disciplina d 
+INNER JOIN academico.matricula m ON d.id = m.id_disciplina
+GROUP BY d.descricao
+ORDER BY media_nota DESC
+
+--obs: Redação: media_nota 81.88 e Matemática: media_nota 78.98, assim, a disciplina Redação apresenta melhor média de notas. 
